@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  {% load static %}
+  
+  <title>Students</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+  <!-- #region datatables files -->
+ <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" />
+ <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+ <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+
+ <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+</head>
+<body>
+    <div class="main">
+        <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Students</li>
+        </ol>
+        </nav>
+    
+    
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-table"></i>
+                Students Data Table 
+                <a type="button"  class="btn btn-sm btn-success" href="#" id="addBtn" data-toggle="modal" data-target="#myModalStudentCreate" 
+                style="padding: 8px; float: right; background-color: green; color: white;">Add Student</a>
+    
+            </div>
+            <div class="card-body">
+              
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="StudentdataTable" width="100%" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Student Name</th>
+                            <th>Mark 1</th> 
+                            <th>Mark 2</th>                      
+                            <th>Mark 3</th>                      
+                            <th>Rank</th>                      
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr id="table-{{ student.id }}">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ student.name }}</td>
+                                <td>{{ student.mark_one }}</td>  
+                                <td>{{ student.mark_two }}</td>                        
+                                <td>{{ student.mark_three }}</td>  
+                                <td>{{ student.rank }}</td>                        
+                                <td>
+                                    <a class="btn btn-sm btn-warning" data-id="{{ student.id }}" type="button" id="editBtn" href="#" 
+                                    data-toggle="modal" data-target="#myModalStudentCreate"><span class="fa fa-edit"></span> Edit</a>
+                                    <a class="btn btn-sm btn-danger delete" data-id="{{ student.id }}" data-name="{{ student.name }}" data-toggle="modal" 
+                                    data-target="#myModalStudentDelete"><span class="fa fa-trash"></span>Delete</a>
+                                </td>
+    
+                            </tr>
+                            {% endfor %}
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> 
+        
+    
+        <div class="container">
+            <div class="modal fade" id="myModalStudentCreate">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                  
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                      <h4 class="modal-title">Student Create</h4>
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <form  id="create_form" method="POST" action="" enctype="multipart/form-data">
+                        {% csrf_token %}
+                    
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <input type="hidden" class="eid">
+                            <div class="form-group">
+                                <label class="control-label">Student Name</label>
+                                <div>
+                                    <input type="text" class="form-control input-lg" id="id_name" name="Name" value="" required>
+                                </div>
+                            </div>  
+                            <div class="form-group">
+                                <label class="control-label">Mark 1</label>
+                                <div>
+                                    <input type="number" class="form-control input-lg" id="id_mark1" name="mark1" value="" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Mark 2</label>
+                                <div>
+                                    <input type="number" class="form-control input-lg" id="id_mark2" name="mark2" value="" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Mark 3</label>
+                                <div>
+                                    <input type="number" class="form-control input-lg" id="id_mark3" name="mark3" value="" required>
+                                </div>
+                            </div>                                  
+                      
+                        </div>
+                    
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="submit" id="modalBtn" class="btn btn-success"></button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>    
+                    
+                  </div>
+                </div>
+              </div>
+        </div>
+    
+        <div class="modal fade" id="myModalStudentDelete">
+            <div class="modal-dialog">
+              <div class="modal-content">
+              
+                <div class="modal-header">
+                  <h4 class="modal-title">Confirm Student Deletion</h4>
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <input type="hidden" id="d_uid">
+    
+                  <span>Are you sure you want to delete the <strong id="du"></strong> Student from Underground ?</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger del">Delete Student</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                
+              </div>
+            </div>
+        </div>
+    
+    
+    
+    </div> 
+</body>
+
+<script>
+    $(document).ready(function(){
+
+        $(document).on('click', '#addBtn', function(){
+            $('.modal-title').html('New Student');
+            $('#modalBtn').addClass('submitbtn');
+            $('#modalBtn').html('Submit');
+            $('#create_form').trigger('reset');
+        
+        });
+
+        $(document).on('click', '#editBtn', function(){
+            $('.modal-title').html('Update Student');
+            $('#modalBtn').addClass('updatebtn');
+            $('#modalBtn').html('Update'); 
+
+            $editId = $(this).attr('data-id');
+            $('.eid').val($editId);
+            $.ajax({
+                type: "POST",
+                url: '/StudentShow',
+                data: {'editId':$editId},
+                success: function(data)
+                {
+                    $("#id_name").val(data.StudentData[0]['name']) 
+                    $("#id_mark1").val(data.StudentData[0]['mark_one'])         
+                    $("#id_mark2").val(data.StudentData[0]['mark_two'])                                     
+                    $("#id_mark3").val(data.StudentData[0]['mark_three'])         
+                                    
+                }
+                });
+
+
+        });
+
+
+
+        var StudentdataTable = $('#StudentdataTable').dataTable({
+        "bJQueryUI" : true,
+        "sPaginationType" : "full_numbers",
+        "bRetrieve" : true,
+        "bFilter" : true,
+        "iDisplayLength": 10,
+        "bProcessing" : true,
+        "bServerSide" : false
+        });
+
+
+        function studentlist(studentdata){
+            $.each(studentdata, function(a,b){
+                $("#StudentdataTable > tbody").prepend("<tr id='table-" +b.id+ "'>\n\
+                            <td id='usr'>"+ b.name +"</td>\n\
+                            <td id='usr'>"+ b.mark_one +"</td>\n\
+                            <td id='usr'>"+ b.mark_two +"</td>\n\
+                            <td id='usr'>"+ b.mark_three +"</td>\n\
+                            <td id='usr'>"+ b.rank +"</td>\n\
+                            <td><a class='btn btn-sm btn-warning' data-id='"+ b.id + "' type='button' id='editBtn' data-toggle='modal' data-target='#myModalStudentCreate'><span class='fa fa-edit'></span>Edit</a>\n\
+                            <a class='btn btn-sm btn-danger delete' data-id='"+ b.id + "' data-name='"+ b.name +"'><span class='fa fa-trash'></span> Delete</a> </td></tr>");
+            });
+            
+        }
+
+
+        $('form').on('submit', function(e){
+            if ($('#modalBtn').hasClass('submitbtn')){    
+                $.ajax({
+                    type : 'POST',
+                    url : '/StudentCreate',
+                    data :{
+                        'csrfmiddlewaretoken': '{{csrf_token}}',
+                        'name': $('#id_name').val(),
+                        'mark_one': $('#id_mark1').val(),
+                        'mark_two': $('#id_mark2').val(),
+                        'mark_three': $('#id_mark3').val(),
+                        
+                    },
+                    dataType : 'json',
+                    success : function(datas)
+
+                    {
+                        if (datas.msg)
+                        { 
+                            $('#myModalStudentCreate').modal('show');
+
+                            swal({
+                                title: "Alert!",
+                                text: datas.msg,
+                                icon: "info",
+                            });
+
+
+                        }
+
+                        studentlist(datas.studentdata);
+                        $('#create_form').trigger('reset');
+                        window.location.href = ''
+                    }
+                });
+                e.preventDefault();
+            }
+            else {
+                $updateId=$('.eid').val();
+
+                var input = {
+                    'name' : $("#id_name").val(),
+                    'mark_one' : $("#id_mark1").val(),
+                    'mark_two' : $("#id_mark2").val(),
+                    'mark_three' : $("#id_mark3").val(),
+                    'updateId':$updateId
+                    }
+
+                $.ajax({
+                    type: "POST",
+                    url: '/StudentUpdate',
+                    data: JSON.stringify(input),
+                    success: function(data)
+                    {
+                        window.location.href = ''   
+                        $('#create_form').trigger('reset');            
+                    }
+                    });
+
+            }
+           
+
+        });    
+
+        $(document).on('click','.delete',function(){               
+            $('#du').html($(this).attr('data-name')); 
+            $('#d_uid').val($(this).attr('data-id'));          
+
+        });
+
+        $('#myModalStudentDelete').on('click','.del',function(){
+            $deleteId= $('#d_uid').val();
+            $.ajax({
+                type: "POST",
+                url: '/StudentDelete',
+                data: {'deleteId': $deleteId},
+                success: function(data)
+                {
+                    window.location.href = ''
+
+                }
+                });
+
+        });
+
+       
+
+    });
+
+</script>
+
+</html>
